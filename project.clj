@@ -4,7 +4,7 @@
         jersey-lookup-service.LookupService]
   :main jersey-lookup-service.core
   :dependencies [[org.clojure/clojure "1.3.0"]
-                 [clj-zoo-service-tracker "1.0.0"]
+                 [clj-zoo-service-tracker "1.0.1"]
                  [org.clojure/tools.logging "0.2.3"]
                  [org.clojure/data.json "0.1.3"]
                  [log4j/log4j "1.2.16"]

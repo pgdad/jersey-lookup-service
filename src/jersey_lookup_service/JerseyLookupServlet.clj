@@ -12,22 +12,26 @@
                               String String String String]}
               :state state
               :init init-state
-              :methods [#^{:static true} [ getTracker [] Object]])
+              :methods [#^{:static true} [ getTracker [String] Object]])
   )
 
 (def getTrckr
-  (memoize (fn [keepers route-root client-reg-root instance-root]
-             (tr/initialize keepers route-root client-reg-root instance-root))))
+  (memoize (fn [keepers]
+             (tr/initialize keepers
+                            (str "/services/PROD/SI/services/DC1")
+                            (str "/clientregistrations/PROD/SI")
+                            (str "/services/PROD/SI/servers/DC1"))
+		)))
 
 (defn -getTracker
-  []
-  (getTrckr keepers route-root client-reg-root instance-root))
+  [keepers]
+  (getTrckr keepers))
+
+(defn getTracker
+  [keepers]
+  (-getTracker keepers))
 
 (defn -init-state
   [packages keepers env app region service major minor micro url]
   [[packages keepers env app region service major minor micro url]
-   (ref {:tracker (getTrckr keepers
-                            (str "/services/" env "/" app "/services/" region)
-                            (str "/clientregistrations/" env "/" app)
-                            (str "/services" env "/" app "/servers/" region))
-         })])
+   (ref {:tracker (getTrckr keepers)})])
