@@ -1,5 +1,5 @@
 (ns jersey-lookup-service.LookupService
-  (:require [zookeeper :as zk] [clojure.tools.logging :as log]
+  (:require [clojure.tools.logging :as log]
             [clojure.string])
   (:use [clj-zoo-service-tracker.core :as tracker])
   (:use [clj-zoo.serverSession])
@@ -10,16 +10,17 @@
   (:gen-class))
 
 (definterface LookerUpper
-  (^String lookup [^String service ^int major ^int minor]))
+  (^String lookup [^String preferRegion ^String service ^int major ^int minor]))
 
 (definterface HostLookerUpper
-  (^String lookup [^String host ^String service ^int major ^int minor]))
+  (^String lookup [^Strig preferRegion ^String host ^String service ^int major ^int minor]))
 
-(deftype ^{Path "/lookup/{service}/{major}/{minor}"} LookerUpperImpl []
+(deftype ^{Path "/lookup/{preferRegion}/{service}/{major}/{minor}"} LookerUpperImpl []
          LookerUpper
          (^{GET true
             Produces ["application/json"]}
           ^String lookup [this
+                          ^{PathParam "preferRegion"} ^String preferRegion
                           ^{PathParam "service"} ^String service
                           ^{PathParam "major"} ^int major
                           ^{PathParam "minor"} ^int minor
@@ -27,17 +28,18 @@
           (use 'clojure.data.json)
           (use 'jersey-lookup-service.JerseyLookupServlet)
           (use 'clj-zoo-service-tracker.core)
-          (let [t (getTracker "localhost")
+          (let [t (getTracker "localhost" preferRegion)
 		url (clj-zoo-service-tracker.core/lookup-service
 			t service major minor "")]
             (json-str url))))
 
 
-(deftype ^{Path "/lookup/{host}/{service}/{major}/{minor}"} HostLookerUpperImpl []
+(deftype ^{Path "/lookup/{preferRegion}/{host}/{service}/{major}/{minor}"} HostLookerUpperImpl []
          HostLookerUpper
          (^{GET true
             Produces ["application/json"]}
           ^String lookup [this
+                          ^{PathParam "preferRegion"} ^String preferRegion
                           ^{PathParam "host"} ^String host
                           ^{PathParam "service"} ^String service
                           ^{PathParam "major"} ^int major
@@ -46,7 +48,7 @@
           (use 'clojure.data.json)
           (use 'jersey-lookup-service.JerseyLookupServlet)
           (use 'clj-zoo-service-tracker.core)
-          (let [t (getTracker "localhost")
+          (let [t (getTracker "localhost" preferRegion)
 		url (clj-zoo-service-tracker.core/lookup-service
 			t service major minor "" :host host)]
             (json-str url))))

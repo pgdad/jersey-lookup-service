@@ -28,7 +28,7 @@
     (let [context (ServletContextHandler.
                    handlers "/" ServletContextHandler/SESSIONS)
           jerseyServlet (ServletHolder.
-                         (JerseyLookupServlet. "jersey_lookup_service.LookupService" keepers env app region name major minor micro (str "http://" myHost ":" port)))
+                         (JerseyLookupServlet. "jersey_lookup_service.LookupService" keepers region name major minor micro (str "http://" myHost ":" port)))
           handler (ConnectHandler.)]
       (. context addServlet jerseyServlet "/*")
       (. handlers addHandler handler)
